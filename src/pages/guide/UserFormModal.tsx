@@ -30,6 +30,15 @@ const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, 
         >
           <Input disabled={viewMode} />
         </Form.Item>
+
+        <Form.Item
+          label="Username"
+          name="username"
+          rules={[{ required: true, message: 'Please enter the username' }]}
+        >
+          <Input disabled={viewMode} />
+        </Form.Item>
+
         <Form.Item
           label="Gender"
           name="gender"
@@ -40,6 +49,8 @@ const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, 
             <Option value="Female">Female</Option>
           </Select>
         </Form.Item>
+
+
         <Form.Item
           label="Address"
           name="address"
@@ -47,6 +58,7 @@ const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, 
         >
           <Input disabled={viewMode} />
         </Form.Item>
+
         <Form.Item
           label="Role"
           name="role"

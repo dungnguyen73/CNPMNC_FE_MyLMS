@@ -23,6 +23,7 @@ const UserTable: FC<UserTableProps> = ({ data, onView, onEdit, onDelete }) => {
   return (
     <Table dataSource={data} rowKey="id" scroll={{ x: '100%' }}>
       <Table.Column title="Full Name" dataIndex="fullname" key="fullname" width={200} />
+      <Table.Column title="Username" dataIndex="username" key="username" width={200} />
       <Table.Column title="Gender" dataIndex="gender" key="gender" width={100} />
       <Table.Column title="Address" dataIndex="address" key="address" width={250} />
       <Table.Column
