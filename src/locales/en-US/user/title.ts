@@ -2,6 +2,7 @@ export const enUS_title = {
   'title.login': 'Login',
   'title.dashboard': 'Dashboard',
   'title.documentation': 'Tests',
+  'title.question': 'Question',
   'title.guide': 'Guide',
   'title.permission.route': 'Route Permission',
   'title.permission.button': 'Button Permission',
