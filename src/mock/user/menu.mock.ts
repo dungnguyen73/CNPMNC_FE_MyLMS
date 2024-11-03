@@ -25,7 +25,7 @@ const mockMenuList: MenuList = [
     code: 'guide',
     label: {
       zh_CN: '引导',
-      en_US: 'Guide',
+      en_US: 'User',
     },
     icon: 'guide',
     path: '/guide',
