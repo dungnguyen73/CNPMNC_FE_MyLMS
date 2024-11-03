@@ -1,77 +1,76 @@
 import type { FC } from 'react';
-import 'driver.js/dist/driver.min.css';
-import { useState } from 'react';
-import { Space, Tag, Dropdown, Menu, Modal, Form, Input, Select } from 'antd';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Space, Tag, Dropdown, Menu, Modal, Form, Input, Select, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import MyButton from '@/components/basic/button';
 import MyTable from '@/components/core/table';
 
-const { Column, ColumnGroup } = MyTable;
+const { Column } = MyTable;
 const { Option } = Select;
 
-interface ColumnType {
-  key: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  address: string;
-  role: string;
-}
-
 interface User {
-  id: number;
-  username: string;
+  id: string;
   fullname: string;
   gender: string;
   address: string;
   role: string;
 }
 
-const data: ColumnType[] = [
-  {
-    key: '1',
-    firstName: 'John',
-    lastName: 'Brown',
-    gender: 'Male',
-    address: 'New York No. 1 Lake Park',
-    role: 'Teacher',
-  },
-  {
-    key: '2',
-    firstName: 'Jim',
-    lastName: 'Green',
-    gender: 'Male',
-    address: 'London No. 1 Lake Park',
-    role: 'Student',
-  },
-  {
-    key: '3',
-    firstName: 'Joe',
-    lastName: 'Black',
-    gender: 'Female',
-    address: 'Sidney No. 1 Lake Park',
-    role: 'Teacher',
-  },
-];
-
-// Extend the data array
-new Array(30).fill(undefined).forEach((_, index) => {
-  data.push({
-    key: index + 4 + '',
-    firstName: 'Joe' + index,
-    lastName: 'Black' + index,
-    gender: index % 2 === 0 ? 'Male' : 'Female',
-    address: 'Sidney No. 1 Lake Park' + index,
-    role: 'Teacher',
-  });
-});
-
 const GuidePage: FC = () => {
+  const [data, setData] = useState<User[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [viewMode, setViewMode] = useState(false);
   const [form] = Form.useForm();
-  const [currentRecord, setCurrentRecord] = useState<ColumnType | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<User | null>(null);
+
+  const apiUrl = 'https://75fbcf2e-9578-42e9-972f-80007010adfe.mock.pstmn.io/api/v1/user';
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(apiUrl);
+      setData(response.data.data);  // Assuming the API returns data in `data`
+    } catch (error) {
+      message.error("Error fetching data");
+    }
+  };
+
+  const addData = async (newRecord: User) => {
+    try {
+      const response = await axios.post(apiUrl, newRecord);
+      setData(prevData => [...prevData, response.data.data]);  // Assuming the new record is in response
+      message.success("Record added successfully");
+    } catch (error) {
+      message.error("Error adding record");
+    }
+  };
+
+  const updateData = async (updatedRecord: User) => {
+    try {
+      await axios.put(`${apiUrl}/${updatedRecord.id}`, updatedRecord);
+      setData(prevData =>
+        prevData.map(record => (record.id === updatedRecord.id ? updatedRecord : record))
+      );
+      message.success("Record updated successfully");
+    } catch (error) {
+      message.error("Error updating record");
+    }
+  };
+
+  const deleteData = async (id: string) => {
+    try {
+      await axios.delete(`${apiUrl}/${id}`);
+      setData(prevData => prevData.filter(record => record.id !== id));
+      message.success("Record deleted successfully");
+    } catch (error) {
+      message.error("Error deleting record");
+    }
+  };
 
   const handleAdd = () => {
     setIsEditMode(false);
@@ -81,7 +80,7 @@ const GuidePage: FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleUpdate = (record: ColumnType) => {
+  const handleUpdate = (record: User) => {
     setIsEditMode(true);
     setViewMode(false);
     setCurrentRecord(record);
@@ -89,7 +88,7 @@ const GuidePage: FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleView = (record: ColumnType) => {
+  const handleView = (record: User) => {
     setIsEditMode(false);
     setViewMode(true);
     setCurrentRecord(record);
@@ -97,12 +96,24 @@ const GuidePage: FC = () => {
     setIsModalVisible(true);
   };
 
+  const handleDelete = (id: string) => {
+    deleteData(id);
+  };
+
   const handleOk = () => {
     form.validateFields().then(values => {
+      const recordToSubmit = {
+        ...values,
+        id: isEditMode && currentRecord ? currentRecord.id : `${Date.now()}`,
+      };
+
+      // Log the values to ensure role is captured correctly
+      console.log("Form Values on Submit:", values);
+
       if (isEditMode && currentRecord) {
-        console.log("Updating record", values);
+        updateData(recordToSubmit);
       } else {
-        console.log("Adding record", values);
+        addData(recordToSubmit);
       }
       setIsModalVisible(false);
     });
@@ -112,11 +123,11 @@ const GuidePage: FC = () => {
     setIsModalVisible(false);
   };
 
-  const menu = (record: ColumnType) => (
+  const menu = (record: User) => (
     <Menu>
       <Menu.Item key="view" onClick={() => handleView(record)}>View</Menu.Item>
       <Menu.Item key="update" onClick={() => handleUpdate(record)}>Update</Menu.Item>
-      <Menu.Item key="delete">Delete</Menu.Item>
+      <Menu.Item key="delete" onClick={() => handleDelete(record.id)}>Delete</Menu.Item>
     </Menu>
   );
 
@@ -132,14 +143,11 @@ const GuidePage: FC = () => {
         </MyButton>
       </div>
 
-      <MyTable<ColumnType> dataSource={data} rowKey={record => record.key} height="100%">
-        <ColumnGroup title="Name">
-          <Column title="First Name" dataIndex="firstName" key="firstName" />
-          <Column title="Last Name" dataIndex="lastName" key="lastName" />
-        </ColumnGroup>
+      <MyTable<User> dataSource={data} rowKey={record => record.id} height="100%">
+        <Column title="Full Name" dataIndex="fullname" key="fullname" />
         <Column title="Gender" dataIndex="gender" key="gender" />
         <Column title="Address" dataIndex="address" key="address" />
-        <Column<ColumnType>
+        <Column<User>
           title="Role"
           dataIndex="role"
           key="role"
@@ -152,7 +160,7 @@ const GuidePage: FC = () => {
         <Column
           title="Action"
           key="action"
-          render={(text, record: ColumnType) => (
+          render={(text, record: User) => (
             <Space size="middle">
               <Dropdown overlay={menu(record)} trigger={['click']}>
                 <MyButton type="text">
@@ -175,16 +183,9 @@ const GuidePage: FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            label="First Name"
-            name="firstName"
-            rules={[{ required: true, message: 'Please enter the first name' }]}
-          >
-            <Input disabled={viewMode} />
-          </Form.Item>
-          <Form.Item
-            label="Last Name"
-            name="lastName"
-            rules={[{ required: true, message: 'Please enter the last name' }]}
+            label="Full Name"
+            name="fullname"
+            rules={[{ required: true, message: 'Please enter the full name' }]}
           >
             <Input disabled={viewMode} />
           </Form.Item>
@@ -208,9 +209,12 @@ const GuidePage: FC = () => {
           <Form.Item
             label="Role"
             name="role"
-            rules={[{ required: true, message: 'Please enter the role' }]}
+            rules={[{ required: true, message: 'Please select the role' }]}
           >
-            <Input disabled={viewMode} />
+            <Select disabled={viewMode} placeholder="Select a role">
+              <Option value="Student">Student</Option>
+              <Option value="Teacher">Teacher</Option>
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
