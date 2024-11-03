@@ -1,19 +1,30 @@
 import type { FC } from 'react';
 import 'driver.js/dist/driver.min.css';
-import { Space, Tag, Dropdown, Menu } from 'antd';
+import { useState } from 'react';
+import { Space, Tag, Dropdown, Menu, Modal, Form, Input, Select } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import MyButton from '@/components/basic/button';
 import MyTable from '@/components/core/table';
 
 const { Column, ColumnGroup } = MyTable;
+const { Option } = Select;
 
 interface ColumnType {
   key: string;
   firstName: string;
   lastName: string;
-  age: number;
+  gender: string;
   address: string;
-  tags: string[];
+  role: string;
+}
+
+interface User {
+  id: number;
+  username: string;
+  fullname: string;
+  gender: string;
+  address: string;
+  role: string;
 }
 
 const data: ColumnType[] = [
@@ -21,25 +32,25 @@ const data: ColumnType[] = [
     key: '1',
     firstName: 'John',
     lastName: 'Brown',
-    age: 32,
+    gender: 'Male',
     address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
+    role: 'Teacher',
   },
   {
     key: '2',
     firstName: 'Jim',
     lastName: 'Green',
-    age: 42,
+    gender: 'Male',
     address: 'London No. 1 Lake Park',
-    tags: ['loser'],
+    role: 'Student',
   },
   {
     key: '3',
     firstName: 'Joe',
     lastName: 'Black',
-    age: 32,
+    gender: 'Female',
     address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
+    role: 'Teacher',
   },
 ];
 
@@ -49,43 +60,93 @@ new Array(30).fill(undefined).forEach((_, index) => {
     key: index + 4 + '',
     firstName: 'Joe' + index,
     lastName: 'Black' + index,
-    age: 32 + index,
+    gender: index % 2 === 0 ? 'Male' : 'Female',
     address: 'Sidney No. 1 Lake Park' + index,
-    tags: ['cool', 'teacher'],
+    role: 'Teacher',
   });
 });
 
 const GuidePage: FC = () => {
-  // Define the CRUD menu
-  const menu = (
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [viewMode, setViewMode] = useState(false);
+  const [form] = Form.useForm();
+  const [currentRecord, setCurrentRecord] = useState<ColumnType | null>(null);
+
+  const handleAdd = () => {
+    setIsEditMode(false);
+    setViewMode(false);
+    setCurrentRecord(null);
+    form.resetFields();
+    setIsModalVisible(true);
+  };
+
+  const handleUpdate = (record: ColumnType) => {
+    setIsEditMode(true);
+    setViewMode(false);
+    setCurrentRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleView = (record: ColumnType) => {
+    setIsEditMode(false);
+    setViewMode(true);
+    setCurrentRecord(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    form.validateFields().then(values => {
+      if (isEditMode && currentRecord) {
+        console.log("Updating record", values);
+      } else {
+        console.log("Adding record", values);
+      }
+      setIsModalVisible(false);
+    });
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const menu = (record: ColumnType) => (
     <Menu>
-      <Menu.Item key="view">View</Menu.Item>
-      <Menu.Item key="update">Update</Menu.Item>
+      <Menu.Item key="view" onClick={() => handleView(record)}>View</Menu.Item>
+      <Menu.Item key="update" onClick={() => handleUpdate(record)}>Update</Menu.Item>
       <Menu.Item key="delete">Delete</Menu.Item>
     </Menu>
   );
 
   return (
-    <div className="aaa">
+    <div className="user-manage">
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        marginBottom: 16 
+      }}>
+        <MyButton type="primary" onClick={handleAdd}>
+          Add
+        </MyButton>
+      </div>
+
       <MyTable<ColumnType> dataSource={data} rowKey={record => record.key} height="100%">
         <ColumnGroup title="Name">
           <Column title="First Name" dataIndex="firstName" key="firstName" />
           <Column title="Last Name" dataIndex="lastName" key="lastName" />
         </ColumnGroup>
-        <Column title="Age" dataIndex="age" key="age" />
+        <Column title="Gender" dataIndex="gender" key="gender" />
         <Column title="Address" dataIndex="address" key="address" />
         <Column<ColumnType>
-          title="Tags"
-          dataIndex="tags"
-          key="tags"
-          render={(tags: string[]) => (
-            <>
-              {tags.map(tag => (
-                <Tag color="blue" key={tag}>
-                  {tag}
-                </Tag>
-              ))}
-            </>
+          title="Role"
+          dataIndex="role"
+          key="role"
+          render={(role: string) => (
+            <Tag color="blue" key={role}>
+              {role}
+            </Tag>
           )}
         />
         <Column
@@ -93,7 +154,7 @@ const GuidePage: FC = () => {
           key="action"
           render={(text, record: ColumnType) => (
             <Space size="middle">
-              <Dropdown overlay={menu} trigger={['click']}>
+              <Dropdown overlay={menu(record)} trigger={['click']}>
                 <MyButton type="text">
                   Actions <DownOutlined />
                 </MyButton>
@@ -102,6 +163,57 @@ const GuidePage: FC = () => {
           )}
         />
       </MyTable>
+
+      {/* Modal for Add, Update, and View */}
+      <Modal
+        title={viewMode ? "View Record" : isEditMode ? "Update Record" : "Add Record"}
+        visible={isModalVisible}
+        onOk={viewMode ? handleCancel : handleOk}
+        onCancel={handleCancel}
+        okText={viewMode ? "Close" : "OK"}
+        cancelButtonProps={{ style: { display: viewMode ? 'none' : 'inline' } }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="First Name"
+            name="firstName"
+            rules={[{ required: true, message: 'Please enter the first name' }]}
+          >
+            <Input disabled={viewMode} />
+          </Form.Item>
+          <Form.Item
+            label="Last Name"
+            name="lastName"
+            rules={[{ required: true, message: 'Please enter the last name' }]}
+          >
+            <Input disabled={viewMode} />
+          </Form.Item>
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[{ required: true, message: 'Please select the gender' }]}
+          >
+            <Select disabled={viewMode}>
+              <Option value="Male">Male</Option>
+              <Option value="Female">Female</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Address"
+            name="address"
+            rules={[{ required: true, message: 'Please enter the address' }]}
+          >
+            <Input disabled={viewMode} />
+          </Form.Item>
+          <Form.Item
+            label="Role"
+            name="role"
+            rules={[{ required: true, message: 'Please enter the role' }]}
+          >
+            <Input disabled={viewMode} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
