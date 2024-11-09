@@ -48,7 +48,6 @@ const TablePage: FC = () => {
 
       console.log(records);
       setData(records);
-      // setLoading(false);
     } catch (error) {
       message.error('Failed to load records');
     }
@@ -65,11 +64,11 @@ const TablePage: FC = () => {
       {isTestSearch && (
         <div>
           <MyTable<TestResult> dataSource={data} rowKey={record => `${record.userId}`}>
-            <Column title="Test's Title" dataIndex="testTitle" key="testTitle" width="8%" />
+            <Column title="Test's Title" dataIndex="testTitle" key="testTitle" width="20%" />
             <Column title="Test Duration" dataIndex="testDuration" key="testDuration" width="8%" />
             <Column title="User Id" dataIndex="userId" key="userId" width="8%" />
             <Column title="User's Name" dataIndex="username" key="username" />
-            <Column title="Student's Name" dataIndex="fullname" key="fullname" width="8%" />
+            <Column title="Student's Name" dataIndex="fullName" key="fullName" width="25%" />
             <Column title="Started Time" dataIndex="testStartTime" key="testStartTime" width="8%" />
             <Column title="Score" dataIndex="score" key="score" width="8%" />
           </MyTable>
@@ -79,9 +78,9 @@ const TablePage: FC = () => {
         <div>
         <MyTable<TestResult> dataSource={data} rowKey={record => `${record.userId}`}>
           <Column title="User Id" dataIndex="userId" key="userId" width="8%" />
-          <Column title="User's Name" dataIndex="username" key="username" />
-          <Column title="Student's Name" dataIndex="fullname" key="fullname" width="8%" />
-          <Column title="Test's Title" dataIndex="testTitle" key="testTitle" width="8%" />
+          <Column title="User's Name" dataIndex="username" key="username" width="10%" />
+          <Column title="Student's Name" dataIndex="fullName" key="fullName" width="15%" />
+          <Column title="Test's Title" dataIndex="testTitle" key="testTitle" width="20%" />
           <Column title="Started Time" dataIndex="testStartTime" key="testStartTime" width="8%" />
           <Column title="Test Duration" dataIndex="testDuration" key="testDuration" width="8%" />
           <Column title="Score" dataIndex="score" key="score" width="8%" />

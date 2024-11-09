@@ -3,18 +3,23 @@ import { Question } from '../interface/question';
 
 const API_QUESTION_URL = 'https://hoaqdzink.onrender.com/api/v1';
 
-const getToken = () => {
+export const getToken = () => {
   return localStorage.getItem('token');
 };
 
-const setToken = (token: string) => {
+export const getRole = () => {
+  return localStorage.getItem('role');
+};
+
+const setToken = (token: string, role: string) => {
   localStorage.setItem('token', token);
+  localStorage.setItem('role', role);
 };
 
-const clearToken = () => {
+export const clearToken = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('role');
 };
-
 
 const login = async (username: string, password: string) => {
   try {
@@ -24,8 +29,9 @@ const login = async (username: string, password: string) => {
     });
 
     const token = response.data.data.accessToken;
+    const role = response.data.data.userResponse.role;
 
-    setToken(token);
+    setToken(token, role);
 
     return token;
   } catch (error) {
@@ -46,7 +52,14 @@ export const authenticate = async (username?: string, password?: string) => {
 
 export const fetchRecords = async () => {
   try {
+    const role = getRole();
+
+    if (role != 'TEACHER') {
+      clearToken();
+    };
+
     const token = await authenticate('vinhnh', 'Test123456');
+
     console.log(token);
     const response = await axios.get(`${API_QUESTION_URL}/questions`, {
       headers: {
