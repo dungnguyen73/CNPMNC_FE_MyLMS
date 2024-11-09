@@ -12,11 +12,12 @@ const DoTest: React.FC<DoTestProps> = ({ testId }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState<number>(0);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const data = await fetchRecords(testId);
+        const data = await fetchRecords();
         setQuestions(data);
       } catch (error) {
         message.error('Error fetching questions');
@@ -34,12 +35,20 @@ const DoTest: React.FC<DoTestProps> = ({ testId }) => {
   };
 
   const handleSubmit = () => {
+    let calculatedScore = 0;
+    questions.forEach((question) => {
+      const correctAnswerValue = question[`choice_${question.correct_ans}` as keyof Question];
+      if (answers[question.Id] === correctAnswerValue) {
+        calculatedScore += 1;
+      }
+    });
+    setScore(calculatedScore);
     setSubmitted(true);
   };
 
   return (
     <div className="dotest-container">
-      {questions.map((question) => (
+      {!submitted && questions.map((question) => (
         <div key={question.Id} className="question-container">
           <h3 className="question-title">{question.question_text}</h3>
           <Radio.Group
@@ -54,19 +63,16 @@ const DoTest: React.FC<DoTestProps> = ({ testId }) => {
           </Radio.Group>
         </div>
       ))}
-      <Button type="primary" className="submit-button" onClick={handleSubmit}>
-        Submit
-      </Button>
+      {!submitted && (
+        <Button type="primary" className="submit-button" onClick={handleSubmit}>
+          Submit
+        </Button>
+      )}
       {submitted && (
         <div className="results-container">
           <h2>Results:</h2>
-          {questions.map((question) => (
-            <div key={question.Id} className="result-item">
-              <p>
-                {question.question_text} - Your answer: {answers[question.Id]} - Correct answer: {question.correct_ans}
-              </p>
-            </div>
-          ))}
+          <p>Your score: {score} / {questions.length}</p>
+          
         </div>
       )}
     </div>
