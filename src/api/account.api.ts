@@ -6,6 +6,7 @@ const apiUrlSingle = 'https://hoaqdzink.onrender.com/api/v1/user';
 
 const token = localStorage.getItem('t');
 
+
 const axiosInstance = axios.create({
   headers: {
     Authorization: `Bearer ${token}`,

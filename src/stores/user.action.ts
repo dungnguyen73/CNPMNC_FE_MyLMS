@@ -6,6 +6,7 @@ import { setUserItem } from './user.store';
 import { createAsyncAction } from './utils';
 import axios from 'axios';
 import { API_QUESTION_URL } from '@/api/question';
+
 // typed wrapper async thunk function demo, no extra feature, just for powerful typings
 export const loginAsync = createAsyncAction<LoginParams, boolean>(payload => {
   return async dispatch => {
