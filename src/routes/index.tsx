@@ -52,7 +52,7 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'documentation',
-        element: <WrapperRouteComponent element={<Documentation />} titleId="title.documentation" />,
+        element: <WrapperRouteComponent element={<Documentation />} titleId="Test Management" />,
       },
       {
         path: 'question',
@@ -68,7 +68,7 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'guide',
-        element: <WrapperRouteComponent element={<Guide />} titleId="title.guide" />,
+        element: <WrapperRouteComponent element={<Guide />} titleId="Account Management" />,
       },
       {
         path: 'permission/route',
