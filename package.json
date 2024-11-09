@@ -2,6 +2,7 @@
   "name": "react-antd-admin",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https:/dungnguyen73.github.io/CNPMNC_FE_MyLMS/",
   "dependencies": {
     "@emotion/core": "^11.0.0",
     "@emotion/react": "^11.5.0",
@@ -9,6 +10,7 @@
     "antd": "^5.0.2",
     "axios": "^0.24.0",
     "driver.js": "^0.9.8",
+    "gh-pages": "^6.2.0",
     "history": "^5.0.1",
     "lodash": "^4.17.21",
     "mockjs": "^1.1.0",
@@ -25,7 +27,9 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "lint": "eslint . --ext js,ts,tsx",
-    "format": "prettier --write **/*.{js,ts,tsx} && eslint . --ext js,ts,tsx --fix"
+    "format": "prettier --write **/*.{js,ts,tsx} && eslint . --ext js,ts,tsx --fix",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [

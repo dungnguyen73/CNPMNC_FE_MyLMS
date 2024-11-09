@@ -7,6 +7,7 @@ import MyButton from '@/components/basic/button';
 import menu from 'antd/es/menu';
 import Title from 'antd/es/typography/Title';
 import useModal from 'antd/es/modal/useModal';
+import { ColumnsType } from 'antd/es/table/Table';
 
 const { Paragraph } = Typography;
 export enum ActionType {
@@ -48,7 +49,7 @@ const DocumentationPage: FC = () => {
       </Menu.Item>
     </Menu>
   );
-  const testColumn = [
+  const testColumn: ColumnsType<any> = [
     {
       title: 'Test Name',
       dataIndex: 'test_name',
@@ -81,17 +82,17 @@ const DocumentationPage: FC = () => {
     },
     {
       title: 'Action',
-      dataIndex: 'actions',
-      render: (_: any, record: any) => {
-        <>
-          <Space size="middle">
-            <Dropdown overlay={menu(record)} trigger={['click']}>
-              <MyButton type="text">
-                Actions <DownOutlined />
-              </MyButton>
-            </Dropdown>
-          </Space>
-        </>;
+    dataIndex: 'actions',
+    render: (_: any, record: any) => {
+      return (
+        <Space size="middle">
+          <Dropdown overlay={menu(record)} trigger={['click']}>
+            <MyButton type="text">
+              Actions <DownOutlined />
+            </MyButton>
+          </Dropdown>
+        </Space>
+        )
       },
     },
   ];
