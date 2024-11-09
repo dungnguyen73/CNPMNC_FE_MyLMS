@@ -21,7 +21,10 @@ const GuidePage: FC = () => {
   const fetchUsersData = async () => {
     try {
       const users = await fetchUsers();
-      setData(users);
+      setData(users.map((user) => ({
+        ...user,
+        password: '123456', 
+      })));
     } catch {
       message.error("Error fetching data");
     }
@@ -63,22 +66,26 @@ const GuidePage: FC = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const userToSave = { ...values, id: isEditMode && currentRecord ? currentRecord.id : `${Date.now()}` };
-
+      
       if (isEditMode && currentRecord) {
+        const userToSave = { ...values, id: currentRecord.id };
         await updateUser(userToSave);
         setData(data.map(record => (record.id === currentRecord.id ? userToSave : record)));
       } else {
-        const newUser = await addUser(userToSave);
-        setData([...data, newUser]);
+        const { id, ...newUser } = values;
+        const addedUser = await addUser(newUser);
+  
+        setData([...data, { ...addedUser, password: values.password }]);
       }
-
+  
       message.success(isEditMode ? "Record updated successfully" : "Record added successfully");
       setIsModalVisible(false);
     } catch {
       message.error("Error saving data");
     }
   };
+  
+  
 
   return (
     <div className="user-manage">
