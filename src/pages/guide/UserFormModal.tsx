@@ -7,17 +7,32 @@ const { Option } = Select;
 interface UserFormModalProps {
   visible: boolean;
   onCancel: () => void;
-  onOk: () => void;
+  onOk: (data: Omit<User, 'id'>) => void; 
   form: any;
   viewMode: boolean;
 }
 
 const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, viewMode }) => {
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields(); 
+      if (!viewMode) {
+        const { id, ...dataWithoutId } = values; 
+        onOk(dataWithoutId); 
+      } else {
+        onCancel();
+      }
+    } catch (error) {
+      console.error('Validation Failed:', error);
+    }
+  };
+  
+
   return (
     <Modal
       title={viewMode ? "View Record" : "Add or Update Record"}
       visible={visible}
-      onOk={viewMode ? onCancel : onOk}
+      onOk={handleOk}
       onCancel={onCancel}
       okText={viewMode ? "Close" : "OK"}
       cancelButtonProps={{ style: { display: viewMode ? 'none' : 'inline' } }}
@@ -40,16 +55,23 @@ const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, 
         </Form.Item>
 
         <Form.Item
-          label="Gender"
-          name="gender"
-          rules={[{ required: true, message: 'Please select the gender' }]}
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: 'Please input the password!' }]}
         >
-          <Select disabled={viewMode}>
-            <Option value="Male">Male</Option>
-            <Option value="Female">Female</Option>
-          </Select>
+          <Input.Password disabled={viewMode} />
         </Form.Item>
 
+        <Form.Item
+          label="Gender"
+          name="gender"
+          rules={[{ required: true, message: 'Please select gender!' }]}
+        >
+          <Select disabled={viewMode}>
+            <Option value={true}>Nam</Option>
+            <Option value={false}>Nữ</Option>
+          </Select>
+        </Form.Item>
 
         <Form.Item
           label="Address"
@@ -60,13 +82,30 @@ const UserFormModal: FC<UserFormModalProps> = ({ visible, onCancel, onOk, form, 
         </Form.Item>
 
         <Form.Item
+          label="Phone"
+          name="phone"
+          rules={[{ required: true, message: 'Please enter the phone' }]}
+        >
+          <Input disabled={viewMode} />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: 'Please enter the email' }]}
+        >
+          <Input disabled={viewMode} />
+        </Form.Item>
+
+        <Form.Item
           label="Role"
           name="role"
           rules={[{ required: true, message: 'Please select the role' }]}
         >
           <Select disabled={viewMode} placeholder="Select a role">
-            <Option value="Student">Student</Option>
-            <Option value="Teacher">Teacher</Option>
+            <Option value="STUDENT">Student</Option>
+            <Option value="TEACHER">Teacher</Option>
+            <Option value="ADMIN">Admin</Option>
           </Select>
         </Form.Item>
       </Form>

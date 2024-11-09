@@ -24,8 +24,19 @@ const UserTable: FC<UserTableProps> = ({ data, onView, onEdit, onDelete }) => {
     <Table dataSource={data} rowKey="id" scroll={{ x: '100%' }}>
       <Table.Column title="Full Name" dataIndex="fullname" key="fullname" width={200} />
       <Table.Column title="Username" dataIndex="username" key="username" width={200} />
-      <Table.Column title="Gender" dataIndex="gender" key="gender" width={100} />
+
+      <Table.Column
+        title="Gender"
+        dataIndex="gender"
+        key="gender"
+        width={100}
+        render={(gender: boolean) => (gender ? 'Nam' : 'Nữ')}
+      />
+
+      <Table.Column title="Phone" dataIndex="phone" key="phone" width={200} />
+      <Table.Column title="Email" dataIndex="email" key="email" width={200} />
       <Table.Column title="Address" dataIndex="address" key="address" width={250} />
+
       <Table.Column
         title="Role"
         dataIndex="role"
