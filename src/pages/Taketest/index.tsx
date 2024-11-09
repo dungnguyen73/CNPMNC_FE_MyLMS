@@ -16,7 +16,9 @@ const Taketest: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchTestResultById(1); // Replace 1 with the appropriate id
+
+        const data = await fetchTestResultById('ST219401'); // Replace 1 with the appropriate id
+
         console.log('Fetched test result:', data); // Log the fetched test result
         setTests(Array.isArray(data) ? data : [data]);
       } catch (error) {
@@ -30,8 +32,10 @@ const Taketest: React.FC = () => {
   const handleTakeTest = async (record: TestResult) => {
     console.log('handleTakeTest called with record:', record); // Log when handleTakeTest is called
     try {
-      const data = await fetchTestResultById(record.testId);
-      console.log('Fetched test details:', data); // Log the fetched test details
+
+      /*const data = await fetchTestResultById(record.userId);
+      console.log('Fetched test details:', data); // Log the fetched test details*/
+
       setSelectedTest(record);
       setShowInput(true);
     } catch (error) {

@@ -64,6 +64,9 @@ const TablePage: FC = () => {
     console.log('Form data submitted:', formData);
 
     const A: Question = {
+
+      id: currentRecord?.id || 0,
+
       questionText: formData.questionText,
       questionType: formData.questionType,
       choiceA: formData.choiceA,
