@@ -36,7 +36,6 @@ const login = async (username: string, password: string) => {
 
 export const authenticate = async (username?: string, password?: string) => {
   let token = getToken();
-
   if (!token && username && password) {
     token = await login(username, password);
   }
@@ -118,3 +117,4 @@ export const deleteRecord = async (id: number) => {
     throw error;
   }
 };
+

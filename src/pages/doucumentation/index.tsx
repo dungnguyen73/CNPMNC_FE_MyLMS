@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from 'react';
-import { Button, Dropdown, Menu, Modal, Space, Table, Typography, Input, Form, Select, DatePicker, message } from 'antd';
+import { Button, Dropdown, Menu, Modal, Space, Table, Typography, Input, Form, Select, Row, Col, List, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import MyButton from '@/components/basic/button';
 import axios from 'axios';
+import { authenticate } from '@/api/question';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -15,55 +16,130 @@ export enum ActionType {
 
 const DocumentationPage: FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(!accessToken);
   const [actionType, setActionType] = useState<ActionType>(ActionType.VIEW);
   const [form] = Form.useForm();
   const [data, setData] = useState<any[]>([]);
   const [currentRecord, setCurrentRecord] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[]>([]);  // For storing the list of questions from the test.
+  const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
+  const [availableQuestions, setAvailableQuestions] = useState<any[]>([
+    { id: 'q1', name: 'Question 1' },
+    { id: 'q2', name: 'Question 2' },
+    // Additional questions can be fetched or added here
+  ]);
+  
 
-  const apiUrl = 'https://75fbcf2e-9578-42e9-972f-80007010adfe.mock.pstmn.io/api/v1/tests';  
+  const apiUrl = 'https://hoaqdzink.onrender.com/api/v1/tests';
+  const loginUrl = 'https://hoaqdzink.onrender.com/api/v1/login';
 
-  // Fetch data from API
+  // Fetch test data
   const fetchData = async () => {
     try {
-      const response = await axios.get(apiUrl);
-      setData(response.data);
+      const token = await authenticate('vvkha', 'Test123456');
+      const response = await axios.get(apiUrl, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.status === 200 && response.data.success) {
+        setData(response.data.data);
+      } else {
+        message.error("Failed to load data.");
+      }
     } catch (error) {
       message.error("Failed to load data.");
       console.error('Error fetching data:', error);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleOpenModal = (type: ActionType, record?: any) => {
-    setIsOpen(true);
-    setActionType(type);
-    setCurrentRecord(record || null);
-    if (type === ActionType.CREATE) {
-      form.resetFields();
-    } else if (record) {
-      form.setFieldsValue(record);
+  const fetchQuestionList = async () => {
+    try {
+      const token = await authenticate('vvkha', 'Test123456');
+      const response = await axios.get(`https://hoaqdzink.onrender.com/api/v1/questions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.status === 200 && response.data.success) {
+        setAvailableQuestions(response.data.data);
+      } else {
+        message.error("Failed to load data.");
+      }
+    } catch (error) {
+      message.error("Failed to load data.");
+      console.error('Error fetching data:', error);
     }
   };
 
+  // Fetch questions by testId
+  const fetchQuestionsByTestId = async (testId: number) => {
+    try {
+      const token = await authenticate('vvkha', 'Test123456');
+      const response = await axios.get(`https://hoaqdzink.onrender.com/api/v1/question/test/${testId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.status === 200 && response.data.success) {
+        console.log(response.data.data);
+        setSelectedQuestions(response.data.data); // set these questions as selected for the modal
+      } else {
+        message.error("Failed to load questions.");
+      }
+    } catch (error) {
+      message.error("Failed to load questions.");
+      console.error('Error fetching questions:', error);
+    }
+  };
+  
+
+  useEffect(() => {
+    fetchData();
+  }, [accessToken]);
+
+  const handleOpenModal = async (type: ActionType, record?: any) => {
+    setIsOpen(true);
+    setActionType(type);
+    setCurrentRecord(record || null);
+    setSelectedQuestions([]); // Reset selected questions
+    
+    await fetchQuestionList(); // fetch available questions
+    
+    if (type === ActionType.CREATE) {
+      form.resetFields();
+    } else if (record) {
+      await fetchQuestionsByTestId(record.id); // fetch questions specific to this test
+      form.setFieldsValue(record); // populate form with existing test data
+    }
+  };
   const handleCloseModal = () => {
     setIsOpen(false);
     setCurrentRecord(null);
+    setSelectedQuestions([]);
+    setQuestions([]);
   };
 
   const handleSubmit = async () => {
     try {
+      const token = await authenticate('vvkha', 'Test123456');
       const values = await form.validateFields();
+      values.creatorId ="TE314702"
+      values.startTime="2024-11-09T04:35:41.861Z"
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       if (actionType === ActionType.CREATE) {
-        await axios.post(apiUrl, values);
+        await axios.post(apiUrl, values, config);
+       
         message.success("Test created successfully.");
       } else if (actionType === ActionType.EDIT && currentRecord) {
-        await axios.put(`${apiUrl}/${currentRecord.key}`, values);
+        await axios.put(`${apiUrl}/${currentRecord.id}`, values, config);
+        for(let i = 0; i < selectedQuestions.length; i++) {
+          await axios.post('https://hoaqdzink.onrender.com/api/v1/question/test', {"questionId": selectedQuestions[i].id,
+            "testId": currentRecord.id 
+          },config);
+        }
+        console.log(currentRecord.id);
         message.success("Test updated successfully.");
       }
-      fetchData(); // Refresh data after submit
+      fetchData();
       handleCloseModal();
     } catch (error) {
       message.error("Failed to save data.");
@@ -71,15 +147,31 @@ const DocumentationPage: FC = () => {
     }
   };
 
+  const handleAddQuestion = (questionId: string) => {
+    const question = availableQuestions.find(q => q.id === questionId);
+    if (question && !selectedQuestions.some(q => q.id === questionId)) {
+      setSelectedQuestions([...selectedQuestions, question]);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`${apiUrl}/${id}`);
+      const token = await authenticate('vvkha', 'Test123456');
+
+      await axios.delete(`${apiUrl}/${id}`, {
+        headers: { Authorization: `Bearer ${token }` }
+      });
       message.success("Test deleted successfully.");
-      fetchData(); // Refresh data after deletion
+      fetchData();
     } catch (error) {
       message.error("Failed to delete data.");
       console.error('Error deleting data:', error);
     }
+  };
+
+  const handleDeleteQuestion = (questionId: string) => {
+
+    setSelectedQuestions(selectedQuestions.filter(q => q.id !== questionId));
   };
 
   const menu = (record: any) => (
@@ -90,19 +182,19 @@ const DocumentationPage: FC = () => {
       <Menu.Item key="update" onClick={() => handleOpenModal(ActionType.EDIT, record)}>
         Update
       </Menu.Item>
-      <Menu.Item key="delete" onClick={() => handleDelete(record.key)}>
+      <Menu.Item key="delete" onClick={() => handleDelete(record.id)}>
         Delete
       </Menu.Item>
     </Menu>
   );
 
   const testColumn = [
-    { title: 'Test Name', dataIndex: 'test_name' },
-    { title: 'Test Type', dataIndex: 'type' },
-    { title: 'Created Date', dataIndex: 'created_date' },
-    { title: 'Number of Questions', dataIndex: 'num_of_question' },
-    { title: 'Duration', dataIndex: 'duration' },
-    { title: 'Test Key', dataIndex: 'test_key' },
+    { title: 'Test Name', dataIndex: 'title', key: 'title' },
+    { title: 'Test Type', dataIndex: 'description', key: 'description' },
+    { title: 'Created By', dataIndex: ['creator', 'fullname'], key: 'creatorName' },
+    { title: 'Role', dataIndex: ['creator', 'role'], key: 'creatorRole' },
+    { title: 'Duration', dataIndex: 'duration', key: 'duration', render: (duration: number) => `${duration} minutes` },
+    { title: 'Test Key', dataIndex: 'passcode', key: 'passcode' },
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -126,36 +218,70 @@ const DocumentationPage: FC = () => {
         <Title>Test Management</Title>
         <Button onClick={() => handleOpenModal(ActionType.CREATE)}>Create Test</Button>
       </div>
-      <Table columns={testColumn} dataSource={data} rowKey="key" />
+      <Table
+        columns={testColumn}
+        dataSource={data}
+        rowKey="id"
+        pagination={{
+          pageSize: 10,  // You can set this to the number of rows per page
+        }}
+        scroll={{ x: 'max-content' }}  // Enables horizontal scrolling when content overflows
+      />
       <Modal
         open={isOpen}
         destroyOnClose
         onCancel={handleCloseModal}
         onOk={handleSubmit}
         title={actionType === ActionType.VIEW ? 'View Test' : actionType === ActionType.EDIT ? 'Edit Test' : 'Create Test'}
+        width="80vw"
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Test Name" name="test_name" rules={[{ required: true, message: 'Please enter the test name' }]}>
-            <Input disabled={viewMode} />
-          </Form.Item>
-          <Form.Item label="Test Type" name="type" rules={[{ required: true, message: 'Please select the test type' }]}>
-            <Select disabled={viewMode} placeholder="Select test type">
-              <Option value="Type 1">Type 1</Option>
-              <Option value="Type 2">Type 2</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="Created Date" name="created_date" rules={[{ required: true, message: 'Please select the created date' }]}>
-            <DatePicker disabled={viewMode} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item label="Number of Questions" name="num_of_question" rules={[{ required: true, message: 'Please enter the number of questions' }]}>
-            <Input type="number" disabled={viewMode} />
-          </Form.Item>
-          <Form.Item label="Duration" name="duration" rules={[{ required: true, message: 'Please enter the duration' }]}>
-            <Input disabled={viewMode} />
-          </Form.Item>
-          <Form.Item label="Test Key" name="test_key" rules={[{ required: true, message: 'Please enter the test key' }]}>
-            <Input disabled={viewMode} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={6}>
+              <Form.Item label="Test Name" name="title" rules={[{ required: true, message: 'Please enter the test name' }]}>
+                <Input disabled={viewMode} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="Test Type" name="description" rules={[{ required: true, message: 'Please enter the description' }]}>
+                <Input disabled={viewMode} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="Duration" name="duration" rules={[{ required: true, message: 'Please enter the duration' }]}>
+                <Input type="number" disabled={viewMode} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="Test Key" name="passcode" rules={[{ required: true, message: 'Please enter the passcode' }]}>
+                <Input disabled={viewMode} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Title level={5}>Questions</Title>
+          <List
+            size="small"
+            bordered
+            dataSource={selectedQuestions}
+            renderItem={item => (
+              <List.Item
+                actions={[<Button onClick={() => handleDeleteQuestion(item.id)} danger>Delete</Button>]}
+              >
+              {item.questionText ? item.questionText : item.questionContent}
+              </List.Item>
+            )}
+          />
+          <Select
+            placeholder="Add questions"
+            onChange={handleAddQuestion}
+            style={{ width: '100%' }}
+            disabled={viewMode}
+          >
+            {
+                availableQuestions.map(q => { return (
+              <Option key={q.id} value={q.id}>{ q.questionText !=null ? q.questionText:q.questionContent}</Option>
+            )})}
+          </Select>
         </Form>
       </Modal>
     </>

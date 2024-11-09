@@ -1,9 +1,8 @@
-import { FC, useState, useEffect } from 'react';
-import { message, Form } from 'antd';
-import UserTable from './UserTable';
-import UserFormModal from './UserFormModal';
-import { fetchUsers, addUser, updateUser, deleteUser } from '../../api/account.api';
-import { User } from '../../types/user';
+import type { FC } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Space, Tag, Dropdown, Menu, Modal, Form, Input, Select, message } from 'antd';
+import { DownOutlined } from '@ant-design/icons'; 
 import MyButton from '@/components/basic/button';
 
 const GuidePage: FC = () => {
