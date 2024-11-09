@@ -10,7 +10,7 @@ export const fetchTestById = async (id: string): Promise<Test> => {
   const response = await axios.get(`${API_TEST_URL}/${id}`);
   return response.data.data; // Assuming the API returns data in `data`
 };
-export const fetchTestPasscodeById = async (id: string): Promise<string> => {
+export const fetchTestPasscodeById = async (id: number): Promise<string> => {
   const response = await axios.get(API_TEST_URL);
   return response.data.data.passcode; // Assuming the passcode is in `data.passcode`
 };

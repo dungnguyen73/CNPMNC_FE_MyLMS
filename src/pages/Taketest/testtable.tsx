@@ -14,7 +14,7 @@ const TestTable: FC<TestTableProps> = ({ data, onTakeTest }) => {
     const endTime = startTime + testDuration * 3600000; // Convert duration from minutes to milliseconds
     const currentTime = Date.now();
     
-    return currentTime >= startTime && currentTime <= endTime && Score === -1;
+    return currentTime >= startTime && currentTime <= endTime && Score !== -1;
   };
   return (
     <Table dataSource={data} rowKey="testId" scroll={{ x: '100%' }}>

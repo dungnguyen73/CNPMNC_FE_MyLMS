@@ -45,13 +45,28 @@ const Taketest: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const passcode = "1234";
-      console.log(`Entered passcode: ${testKey}, Expected passcode: ${passcode}`);
-      if (selectedTest && passcode === testKey) {
-        setIsKeyValid(true);
-        console.log('Test key is valid'); // Log when the test key is valid
+      if (!selectedTest) {
+        message.error('No test selected');
+        return;
+      }
+      const response = await fetch(`https://hoaqdzink.onrender.com/api/v1/tests/${selectedTest.testId}`, {
+        headers: {
+          'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aW5obmgiLCJleHAiOjE3MzEzMDEwNjMsImlhdCI6MTczMTEyODI2MywiVXNlcmlkIjoiQUQ3MzI3OTMiLCJzY29wZSI6IkFETUlOIn0.3lZnx_6HC7MGxIoepSYLvcsDxW1Ufhk15QgFUsCfT_Hu4gGYxjb0QWjwHPXsw6vV1g6ylUZqMZ1-CTSbY3p8VQ `
+        }
+      });      
+      const result = await response.json();
+  
+      if (response.ok && result.success) {
+        const passcode = result.data.passcode;
+        console.log(`Entered passcode: ${testKey}, Expected passcode: ${passcode}`);
+        if (selectedTest && passcode === testKey) {
+          setIsKeyValid(true);
+          console.log('Test key is valid'); // Log when the test key is valid
+        } else {
+          message.error('Invalid test key');
+        }
       } else {
-        alert('Invalid test key');
+        message.error('Failed to fetch test details');
       }
     } catch (error) {
       message.error('Error validating test key');
