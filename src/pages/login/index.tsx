@@ -13,8 +13,8 @@ import { formatSearch } from '@/utils/formatSearch';
 import { loginAsync } from '../../stores/user.action';
 
 const initialValues: LoginParams = {
-  username: 'guest',
-  password: 'guest',
+  username: 'vinhnh',
+  password: 'Test123456',
   // remember: true
 };
 

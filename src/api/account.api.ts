@@ -4,8 +4,7 @@ import { User } from '../types/user';
 const apiUrlGetAll = 'https://hoaqdzink.onrender.com/api/v1/users';
 const apiUrlSingle = 'https://hoaqdzink.onrender.com/api/v1/user';
 
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aW5obmgiLCJleHAiOjE3MzEyODU5NjEsImlhdCI6MTczMTExMzE2MSwiVXNlcmlkIjoiQUQ3MzI3OTMiLCJzY29wZSI6IkFETUlOIn0.2oGAKswwieCnnR41lRYBbz2KiQoPBElCvvGNjS8hkAYKfefXEnVtK5q4h0eyjPnLC2QbFplpXNvluXIQyWP54w'; 
-
+const token = localStorage.getItem('t');
 
 const axiosInstance = axios.create({
   headers: {

@@ -4,27 +4,38 @@ import type { Dispatch } from '@reduxjs/toolkit';
 import { apiLogin, apiLogout } from '../api/user.api';
 import { setUserItem } from './user.store';
 import { createAsyncAction } from './utils';
+import axios from 'axios';
+import { API_QUESTION_URL } from '@/api/question';
 // typed wrapper async thunk function demo, no extra feature, just for powerful typings
 export const loginAsync = createAsyncAction<LoginParams, boolean>(payload => {
   return async dispatch => {
-    const { result, status } = await apiLogin(payload);
+    try {
+      const response = await axios.post(`${API_QUESTION_URL}/login`, payload);
+      const { accessToken, userResponse } = response.data.data; 
 
-    if (status) {
-      localStorage.setItem('t', result.token);
-      localStorage.setItem('username', result.username);
-      dispatch(
-        setUserItem({
-          logged: true,
-          username: result.username,
-        }),
-      );
+      if (accessToken) {
+        localStorage.setItem('t', accessToken);
+        localStorage.setItem('username', userResponse.username);
+        localStorage.setItem('role', userResponse.role);
 
-      return true;
+        dispatch(
+          setUserItem({
+            logged: true,
+            username: userResponse.username,
+          })
+        );
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
     }
-
-    return false;
   };
 });
+
 
 export const logoutAsync = () => {
   return async (dispatch: Dispatch) => {
