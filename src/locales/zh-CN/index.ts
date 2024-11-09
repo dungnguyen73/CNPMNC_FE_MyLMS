@@ -3,6 +3,7 @@ import { zhCN_component } from './component';
 import { zhCN_dashboard } from './dashboard';
 import { zhCN_documentation } from './documentation';
 import { zhCN_question } from './question';
+import { zhCN_result } from './result';
 import { zhCN_globalTips } from './global/tips';
 import { zhCN_guide } from './guide';
 import { zhCN_notice } from './notice';

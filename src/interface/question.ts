@@ -1,10 +1,11 @@
 export interface Question {
-  Id: string;
-  question_text: string;
-  question_type: string;
-  choice_A: string;
-  choice_B: string;
-  choice_C: string;
-  choice_D: string;
-  correct_ans: string;
+  id: number;
+  questionText: string;
+  questionType: string;
+  choiceA: string;
+  choiceB: string;
+  choiceC: string;
+  choiceD: string;
+  correctAnswer: 'A' | 'B' | 'C' | 'D';
+  score: number;
 }

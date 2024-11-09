@@ -4,6 +4,7 @@ export const enUS_title = {
   'title.documentation': 'Tests',
   'title.question': 'Question',
   'title.guide': 'Guide',
+  'title.result': 'Result',
   'title.permission.route': 'Route Permission',
   'title.permission.button': 'Button Permission',
   'title.permission.config': 'Permission Config',
