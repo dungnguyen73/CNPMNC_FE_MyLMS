@@ -1,30 +1,26 @@
 import { FC } from 'react';
 import { Table, Space, Button } from 'antd';
-import { Test } from '../../interface/test';
+import { TestResult } from '../../interface/testforstu';
 
 interface TestTableProps {
-  data: Test[];
-  onTakeTest: (record: Test) => void;
+  data: TestResult[];
+  onTakeTest: (record: TestResult) => void;
 }
 
 const TestTable: FC<TestTableProps> = ({ data, onTakeTest }) => {
+  console.log('TestTable data:', data); // Log the data passed to TestTable
+
   return (
-    <Table dataSource={data} rowKey="id" scroll={{ x: '100%' }}>
-      <Table.Column title="Test Name" dataIndex="title" key="title" width={200} />
-      <Table.Column title="Description" dataIndex="description" key="description" width={250} />
-      <Table.Column 
-        title="Creator" 
-        dataIndex={['creator', 'fullname']} 
-        key="creator" 
-        width={200} 
-      />
-      <Table.Column title="Start Time" dataIndex="startTime" key="startTime" width={200} />
-      <Table.Column title="Duration" dataIndex="duration" key="duration" width={100} />
+    <Table dataSource={data} rowKey="testId" scroll={{ x: '100%' }}>
+      <Table.Column title="Test Title" dataIndex="testTitle" key="testTitle" width={200} />
+      <Table.Column title="Score" dataIndex="score" key="score" width={100} />
+      <Table.Column title="Start Time" dataIndex="testStartTime" key="testStartTime" width={200} />
+      <Table.Column title="Duration" dataIndex="testDuration" key="testDuration" width={100} />
       <Table.Column
         title="Action"
         key="action"
         width={150}
-        render={(_, record: Test) => (
+        render={(_, record: TestResult) => (
           <Space size="middle">
             <Button type="primary" onClick={() => onTakeTest(record)}>
               Take Test
