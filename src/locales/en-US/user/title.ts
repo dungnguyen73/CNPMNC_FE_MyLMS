@@ -10,4 +10,5 @@ export const enUS_title = {
   'title.permission.config': 'Permission Config',
   'title.account': 'Account',
   'title.notFount': '404',
+  'title.taketest': 'Take Test',
 };

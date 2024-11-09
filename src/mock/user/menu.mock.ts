@@ -49,6 +49,15 @@ const mockMenuList: MenuList = [
     path: '/guide',
   },
   {
+    code: 'Taketest',
+    label: {
+      zh_CN: '引导',
+      en_US: 'Taketest',
+    },
+    icon: 'guide',
+    path: '/Taketest',
+  },
+  {
     code: 'permission',
     label: {
       zh_CN: '权限',
@@ -132,6 +141,14 @@ const mockMenuList: MenuList = [
         },
         path: '/component/radio-cards',
       },
+      {
+        code: 'componentRadioCards',
+        label: {
+          zh_CN: '单选卡片',
+          en_US: 'Radio Cards',
+        },
+        path: '/component/radio-cards',
+      },
     ],
   },
 
@@ -176,14 +193,7 @@ const mockMenuList: MenuList = [
         },
         path: '/business/with-radio-cards',
       },
-      {
-        code: 'withTabs',
-        label: {
-          zh_CN: '带选项卡',
-          en_US: 'With Tabs',
-        },
-        path: '/business/with-tabs',
-      },
+      
     ],
   },
 ];

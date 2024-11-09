@@ -10,12 +10,14 @@ import LayoutPage from '@/pages/layout';
 import LoginPage from '@/pages/login';
 
 import WrapperRouteComponent from './config';
+import TestTable from '@/pages/Taketest/testtable';
 
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
 const Question = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/question'));
 const Result = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/result'));
 const Guide = lazy(() => import(/* webpackChunkName: "guide'"*/ '@/pages/guide'));
+const Taketest = lazy(() => import(/* webpackChunkName: "Taketest'"*/ '@/pages/Taketest'));
 const RoutePermission = lazy(() => import(/* webpackChunkName: "route-permission"*/ '@/pages/permission/route'));
 const FormPage = lazy(() => import(/* webpackChunkName: "form'"*/ '@/pages/components/form'));
 const TablePage = lazy(() => import(/* webpackChunkName: "table'"*/ '@/pages/components/table'));
@@ -55,6 +57,10 @@ const routeList: RouteObject[] = [
       {
         path: 'question',
         element: <WrapperRouteComponent element={<Question />} titleId="title.question" />,
+      },
+      {
+        path: 'Taketest',
+        element: <WrapperRouteComponent element={<Taketest />} titleId="title.taketest" />
       },
       {
         path: 'result',
