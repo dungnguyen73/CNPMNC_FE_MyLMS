@@ -15,7 +15,7 @@ export interface Test {
   description: string;
   passcode: string;
   creator: Creator;
-  startTime: string;
+  startTime: Date;
   duration: number;
 }
 

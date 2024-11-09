@@ -60,11 +60,11 @@ const routeList: RouteObject[] = [
       },
       {
         path: 'Taketest',
-        element: <WrapperRouteComponent element={<Taketest />} titleId="title.taketest" />
+        element: <WrapperRouteComponent element={<Taketest />} titleId="title.taketest" />,
       },
-      {
-        path: 'result',
+      {  path: 'result',
         element: <WrapperRouteComponent element={<Result />} titleId="title.result" />,
+
       },
       {
         path: 'guide',
