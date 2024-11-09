@@ -14,6 +14,7 @@ import WrapperRouteComponent from './config';
 const NotFound = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/404'));
 const Documentation = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/doucumentation'));
 const Question = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/question'));
+const Result = lazy(() => import(/* webpackChunkName: "404'"*/ '@/pages/result'));
 const Guide = lazy(() => import(/* webpackChunkName: "guide'"*/ '@/pages/guide'));
 const RoutePermission = lazy(() => import(/* webpackChunkName: "route-permission"*/ '@/pages/permission/route'));
 const FormPage = lazy(() => import(/* webpackChunkName: "form'"*/ '@/pages/components/form'));
@@ -54,6 +55,10 @@ const routeList: RouteObject[] = [
       {
         path: 'question',
         element: <WrapperRouteComponent element={<Question />} titleId="title.question" />,
+      },
+      {
+        path: 'result',
+        element: <WrapperRouteComponent element={<Result />} titleId="title.result" />,
       },
       {
         path: 'guide',

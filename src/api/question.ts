@@ -34,7 +34,7 @@ const login = async (username: string, password: string) => {
   }
 };
 
-const authenticate = async (username?: string, password?: string) => {
+export const authenticate = async (username?: string, password?: string) => {
   let token = getToken();
 
   if (!token && username && password) {
