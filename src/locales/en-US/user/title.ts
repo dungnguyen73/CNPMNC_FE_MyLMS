@@ -3,7 +3,7 @@ export const enUS_title = {
   'title.dashboard': 'Dashboard',
   'title.documentation': 'Tests',
   'title.question': 'Question',
-  'title.guide': 'Guide',
+  'title.guide': 'Account',
   'title.permission.route': 'Route Permission',
   'title.permission.button': 'Button Permission',
   'title.permission.config': 'Permission Config',

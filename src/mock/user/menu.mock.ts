@@ -34,7 +34,7 @@ const mockMenuList: MenuList = [
     code: 'guide',
     label: {
       zh_CN: '引导',
-      en_US: 'User',
+      en_US: 'Account',
     },
     icon: 'guide',
     path: '/guide',
