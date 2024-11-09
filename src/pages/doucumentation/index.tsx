@@ -3,7 +3,6 @@ import { Button, Dropdown, Menu, Modal, Space, Table, Typography, Input, Form, S
 import { DownOutlined } from '@ant-design/icons';
 import MyButton from '@/components/basic/button';
 import axios from 'axios';
-import { authenticate } from '@/api/question';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -29,6 +28,46 @@ const DocumentationPage: FC = () => {
     { id: 'q2', name: 'Question 2' },
     // Additional questions can be fetched or added here
   ]);
+
+  const getToken = () => {
+    return localStorage.getItem('token');
+  };
+  
+  const setToken = (token: string) => {
+    localStorage.setItem('token', token);
+  };
+  const API_QUESTION_URL = 'https://hoaqdzink.onrender.com/api/v1';
+
+  const clearToken = () => {
+    localStorage.removeItem('token');
+  };
+
+  const login = async (username: string, password: string) => {
+    try {
+      const response = await axios.post(`${API_QUESTION_URL}/login`, {
+        username: username,
+        password: password,
+      });
+  
+      const token = response.data.data.accessToken;
+  
+      setToken(token);
+  
+      return token;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+const authenticate = async (username?: string, password?: string) => {
+    let token = getToken();
+    if (!token && username && password) {
+      token = await login(username, password);
+    }
+  
+    return token;
+  };
   
 
   const apiUrl = 'https://hoaqdzink.onrender.com/api/v1/tests';
